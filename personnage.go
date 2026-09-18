@@ -1,4 +1,4 @@
-Package main
+package main
 
 import "fmt"
 
@@ -36,7 +36,7 @@ func initCharacter(name string,class string) Character {
 	energy := 0
 	attack := 0
 	defense := 0
-	switch{
+	switch class {
         case "Netrunner":
                 maxHP = 80
                 energy = 120
@@ -57,13 +57,13 @@ func initCharacter(name string,class string) Character {
 		Name: name,
 		Class: class,
 		Level: 1,
-		HP: maxHP
-		MaxHP: maxHP
+		HP: maxHP,
+		MaxHP: maxHP,
 		Energy: energy,
 		Defense: defense,
 		Argent: 100,
-		Equipment: Equipment{}
-		Inventory: []string{}
+		Equipment: Equipment{},
+		Inventory: []string{},
 	}
 	return character
 }
