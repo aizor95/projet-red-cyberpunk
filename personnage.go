@@ -60,6 +60,7 @@ func initCharacter(name string,class string) Character {
 		HP: maxHP,
 		MaxHP: maxHP,
 		Energy: energy,
+		Attack: attack,
 		Defense: defense,
 		Argent: 100,
 		Equipment: Equipment{},
@@ -103,4 +104,5 @@ func main(){
 	fmt.Println("===========================")
 	fmt.Println("")
 	fmt.Println("bienvenue :",character.Name)
+	fmt.Println("Attaque :",character.Attack)
 }
