@@ -2,59 +2,57 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"time"
 	"unicode"
-	"strings"
 )
 
+// STRUCTURES
+
 type Character struct {
-	Name string
-	Class string
-	Level int
-	HP int
-	MaxHP int
-	Energy int
-	Attack int
-	Defense int
-	Argent int
+	Name      string
+	Class     string
+	Level     int
+	HP        int
+	MaxHP     int
+	Energy    int
+	Attack    int
+	Defense   int
+	Argent    int
 	Equipment Equipment
 	Inventory []string
 	Skill     []string
 }
 
 type Equipment struct {
-	head EquipmentItem
+	head  EquipmentItem
 	torse EquipmentItem
-	feet EquipmentItem
+	feet  EquipmentItem
 }
 
 type EquipmentItem struct {
-	Name string
-	Slot string
+	Name       string
+	Slot       string
 	MaxHPbonus int
-	Attack int
-	Defense int
-	Energy int
+	Attack     int
+	Defense    int
+	Energy     int
 }
 
-type MerchantItem struct {
-	Name  string
-	Price int
-}
+// CREATION DU PERSONNAGE
 
 func initCharacter(name string, class string) Character {
 	maxHP := 0
 	energy := 0
 	attack := 0
 	defense := 0
-
 	switch class {
 	case "Netrunner":
 		maxHP = 80
 		energy = 120
 		attack = 5
 		defense = 2
-	case "Mercenary":
+	case "Mercenaire":
 		maxHP = 100
 		energy = 100
 		attack = 7
@@ -82,183 +80,7 @@ func initCharacter(name string, class string) Character {
 	}
 }
 
-func accessInventory(p Character) []string {
-	fmt.Println("\n=== STORAGE UNIT (INVENTORY) ===")
-
-	if len(p.Inventory) == 0 {
-		fmt.Println("Inventory is empty.")
-		return p.Inventory
-	}
-
-	for i, item := range p.Inventory {
-		fmt.Printf("%d. %s\n", i+1, item)
-	}
-
-	return p.Inventory
-}
-
-func takePot(p *Character) {
-	index := -1
-
-	for i, item := range p.Inventory {
-		if item == "Stimpack" {
-			index = i
-			break
-		}
-	}
-
-	if index == -1 {
-		fmt.Println("Error: No Stimpack available in your inventory!")
-		return
-	}
-
-	p.Inventory = append(p.Inventory[:index], p.Inventory[index+1:]...)
-
-	p.HP += 50
-	if p.HP > p.MaxHP {
-		p.HP = p.MaxHP
-	}
-
-	fmt.Println(">>> Stimpack used! (+50 HP)")
-	fmt.Printf("Current body integrity: %d / %d HP\n", p.HP, p.MaxHP)
-}
-
-func mainMenu(p *Character) {
-	loop := true
-
-	for loop {
-		var choice int
-
-		fmt.Println("\n===========================")
-		fmt.Println("         MAIN MENU         ")
-		fmt.Println("===========================")
-		fmt.Println("1. Display character profile")
-		fmt.Println("2. Access inventory")
-		fmt.Println("3. Cybernetic Workshop")
-		fmt.Println("4. Quit")
-		fmt.Print("\nEnter your choice: ")
-		fmt.Scanln(&choice)
-
-		switch choice {
-		case 1:
-			fmt.Println("\n--- CHARACTER PROFILE ---")
-			fmt.Println("Name:", p.Name)
-			fmt.Println("Class:", p.Class)
-			fmt.Printf("Health: %d/%d HP\n", p.HP, p.MaxHP)
-			fmt.Println("Attack:", p.Attack)
-			fmt.Println("Skills:", p.Skill)
-
-		case 2:
-			accessInventory(*p)
-
-			var invChoice int
-			fmt.Println("\n[1] Use Stimpack | [2] Use Cyber Virus | [3] Read Spellbook | [4] Back")
-			fmt.Print("Choice: ")
-			fmt.Scanln(&invChoice)
-
-			if invChoice == 1 {
-				takePot(p)
-			} else if invChoice == 2 {
-				poisonPot(p)
-			} else if invChoice == 3 {
-				spellBook(p)
-			}
-
-		case 3:
-			merchant(p)
-
-		case 4:
-			fmt.Println("Exiting Neon City system...")
-			loop = false
-
-		default:
-			fmt.Println("Invalid choice, please try again.")
-		}
-	}
-}
-
-func addInventory(p *Character, item string) {
-	if isInventoryFull(p) {
-		fmt.Println("\n[!] WARNING: Storage capacity reached! Limit is 10 items.")
-		fmt.Printf("Could not acquire: %s\n", item)
-		return
-	}
-
-	p.Inventory = append(p.Inventory, item)
-	fmt.Printf(">> Added to storage: %s (%d/10 slots occupied)\n", item, len(p.Inventory))
-}
-
-func merchant(p *Character) {
-	var choice int
-
-	fmt.Println("\n==================================")
-	fmt.Println("   CYBERNETIC WORKSHOP (MERCHANT) ")
-	fmt.Println("==================================")
-	fmt.Println("1. Stimpack (Free)")
-	fmt.Println("2. Cyber Virus (Free)")
-	fmt.Println("3. Spellbook: Boule de Feu (Free)")
-	fmt.Println("4. Back to main menu")
-	fmt.Print("\nYour choice: ")
-	fmt.Scanln(&choice)
-
-	switch choice {
-	case 1:
-		addInventory(p, "Stimpack")
-	case 2:
-		addInventory(p, "Cyber Virus")
-	case 3:
-		addInventory(p, "Spellbook: Boule de Feu")
-	case 4:
-		fmt.Println("Returning to main menu...")
-	default:
-		fmt.Println("Invalid choice.")
-	}
-}
-
-func isDead(p *Character) bool {
-	if p.HP <= 0 {
-		fmt.Println("\n==================================")
-		fmt.Println("         SYSTEM FAILURE           ")
-		fmt.Println("             WASTED               ")
-		fmt.Println("==================================")
-		fmt.Println("You died in the streets of Neon City...")
-
-		p.HP = p.MaxHP / 2
-
-		fmt.Println("System reboot in progress...")
-		fmt.Printf("You have been revived with %d / %d HP.\n", p.HP, p.MaxHP)
-		fmt.Println("==================================")
-		return true
-	}
-	return false
-}
-
-func poisonPot(p *Character) {
-	fmt.Println("\n[!] Warning: Cyber Virus activated! Taking damage over time...")
-
-	for tick := 1; tick <= 3; tick++ {
-		time.Sleep(1 * time.Second)
-		p.HP -= 10
-
-		fmt.Printf("Tick %d/3 - HP: %d / %d\n", tick, p.HP, p.MaxHP)
-
-		if isDead(p) {
-			break
-		}
-	}
-}
-
-func spellBook(p *Character) {
-	for _, s := range p.Skill {
-		if s == "Boule de Feu" {
-			fmt.Println("You have already learned the spell: Boule de Feu!")
-			return
-		}
-	}
-
-	p.Skill = append(p.Skill, "Boule de Feu")
-	fmt.Println(">>> New spell learned: Boule de Feu!")
-}
+// NOM DU PERSONNAGE
 
 func isValidName(name string) bool {
 	if len(name) == 0 {
@@ -276,15 +98,18 @@ func formatName(name string) string {
 	if len(name) == 0 {
 		return name
 	}
-	lower := strings.ToLower(name)
-	return strings.ToUpper(string(lower[0])) + lower[1:]
+	runes := []rune(strings.ToLower(name))
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
 }
+
+// CREATION INTERACTIVE
 
 func characterCreation() Character {
 	var rawName string
 	var choice int
 	var selectedClass string
-
+	// Choix du nom
 	for {
 		fmt.Print("Enter character name (letters only): ")
 		fmt.Scanln(&rawName)
@@ -294,14 +119,12 @@ func characterCreation() Character {
 		}
 		fmt.Println("Invalid input! Name must contain letters only.")
 	}
-
 	formattedName := formatName(rawName)
-
+	// Choix de la classe
 	fmt.Println("\nSelect your class:")
 	fmt.Println("1. Netrunner")
 	fmt.Println("2. Mercenary")
 	fmt.Println("3. Cyborg")
-
 	for {
 		fmt.Print("Your choice (1-3): ")
 		fmt.Scanln(&choice)
@@ -310,7 +133,6 @@ func characterCreation() Character {
 		}
 		fmt.Println("Invalid choice, select between 1 and 3.")
 	}
-
 	switch choice {
 	case 1:
 		selectedClass = "Netrunner"
@@ -319,51 +141,257 @@ func characterCreation() Character {
 	case 3:
 		selectedClass = "Cyborg"
 	}
-
 	return initCharacter(formattedName, selectedClass)
 }
 
+// AFFICHAGE DU PROFIL
+
+func displayInfo(p *Character) {
+	fmt.Println("\n===================================")
+	fmt.Println("         CHARACTER PROFILE")
+	fmt.Println("===================================")
+	fmt.Println("Name:", p.Name)
+	fmt.Println("Class:", p.Class)
+	fmt.Println("Level:", p.Level)
+	fmt.Printf("Health: %d/%d HP\n", p.HP, p.MaxHP)
+	fmt.Printf("Energy: %d\n", p.Energy)
+	fmt.Println("Attack:", p.Attack)
+	fmt.Println("Defense:", p.Defense)
+	fmt.Println("Credits:", p.Argent)
+	fmt.Println("Skills:", p.Skill)
+	fmt.Println("===================================")
+}
+
+// INVENTAIRE
+
+func accessInventory(p *Character) {
+	fmt.Println("\n===================================")
+	fmt.Println("          STORAGE UNIT")
+	fmt.Println("===================================")
+	if len(p.Inventory) == 0 {
+		fmt.Println("Inventory is empty.")
+		return
+	}
+	for i, item := range p.Inventory {
+		fmt.Printf("%d. %s\n", i+1, item)
+	}
+	fmt.Printf("\nStorage: %d/10 items\n", len(p.Inventory))
+}
+
+// Vérifie si l'inventaire est plein
 func isInventoryFull(p *Character) bool {
-	maxCapacity := 10
-	if len(p.Inventory) >= maxCapacity {
+	return len(p.Inventory) >= 10
+}
+
+// Ajoute un objet
+func addInventory(p *Character, item string) {
+	if isInventoryFull(p) {
+		fmt.Println("\n[!] WARNING: Storage capacity reached!")
+		fmt.Println("Limit is 10 items.")
+		fmt.Println("Could not acquire:", item)
+		return
+	}
+	p.Inventory = append(p.Inventory, item)
+	fmt.Printf("\n>> Added to storage: %s\n", item)
+	fmt.Printf("Storage: %d/10 items\n", len(p.Inventory))
+}
+
+// Retire le premier exemplaire d'un objet
+func removeInventoryItem(p *Character, itemName string) bool {
+	for i, item := range p.Inventory {
+		if item == itemName {
+			// On supprime l'objet situé à l'indice i
+			p.Inventory = append(
+				p.Inventory[:i],
+				p.Inventory[i+1:]...,
+			)
+			return true
+		}
+	}
+	return false
+}
+
+// UTILISATION DES OBJETS
+
+// Stimpack
+func takePot(p *Character) {
+	if !removeInventoryItem(p, "Stimpack") {
+		fmt.Println("\nError: No Stimpack available!")
+		return
+	}
+	p.HP += 50
+	if p.HP > p.MaxHP {
+		p.HP = p.MaxHP
+	}
+	fmt.Println("\n>>> Stimpack used! (+50 HP)")
+	fmt.Printf("Current body integrity: %d/%d HP\n", p.HP, p.MaxHP)
+}
+
+// Cyber Virus
+func poisonPot(p *Character) {
+	if !removeInventoryItem(p, "Cyber Virus") {
+		fmt.Println("\nError: No Cyber Virus available!")
+		return
+	}
+	fmt.Println("\n[!] Cyber Virus activated!")
+	fmt.Println("You are taking damage over time...")
+	for tick := 1; tick <= 3; tick++ {
+		time.Sleep(1 * time.Second)
+		p.HP -= 10
+		fmt.Printf(
+			"Tick %d/3 - HP: %d/%d\n",
+			tick,
+			p.HP,
+			p.MaxHP,
+		)
+
+		if isDead(p) {
+			break
+		}
+	}
+}
+
+// Livre de sorts
+func spellBook(p *Character) {
+	for _, skill := range p.Skill {
+		if skill == "Boule de Feu" {
+			fmt.Println("\nYou have already learned Boule de Feu!")
+			return
+		}
+	}
+	p.Skill = append(p.Skill, "Boule de Feu")
+	fmt.Println("\n>>> New spell learned: Boule de Feu!")
+}
+
+// UTILISATION DE L'INVENTAIRE
+
+func inventoryMenu(p *Character) {
+	for {
+		accessInventory(p)
+		fmt.Println("\nWhat do you want to do?")
+		fmt.Println("1. Use Stimpack")
+		fmt.Println("2. Use Cyber Virus")
+		fmt.Println("3. Use Spellbook: Boule de Feu")
+		fmt.Println("4. Back")
+		var choice int
+		fmt.Print("Choice: ")
+		fmt.Scanln(&choice)
+		switch choice {
+		case 1:
+			takePot(p)
+		case 2:
+			poisonPot(p)
+		case 3:
+			if removeInventoryItem(p, "Spellbook: Boule de Feu") {
+				spellBook(p)
+			} else {
+				fmt.Println("\nYou do not have this spellbook.")
+			}
+		case 4:
+			return
+		default:
+			fmt.Println("\nInvalid choice.")
+		}
+	}
+}
+
+// MARCHAND
+
+func merchant(p *Character) {
+	for {
+		fmt.Println("\n===================================")
+		fmt.Println("       CYBERNETIC WORKSHOP")
+		fmt.Println("===================================")
+		fmt.Println("Your credits:", p.Argent)
+		fmt.Println()
+		fmt.Println("1. Stimpack - Free")
+		fmt.Println("2. Cyber Virus - Free")
+		fmt.Println("3. Spellbook: Boule de Feu - Free")
+		fmt.Println("4. Back")
+		var choice int
+		fmt.Print("\nYour choice: ")
+		fmt.Scanln(&choice)
+		switch choice {
+		case 1:
+			addInventory(p, "Stimpack")
+		case 2:
+			addInventory(p, "Cyber Virus")
+		case 3:
+			addInventory(p, "Spellbook: Boule de Feu")
+		case 4:
+			return
+		default:
+			fmt.Println("\nInvalid choice.")
+		}
+	}
+}
+
+// MORT DU PERSONNAGE
+
+func isDead(p *Character) bool {
+	if p.HP <= 0 {
+		fmt.Println("\n===================================")
+		fmt.Println("          SYSTEM FAILURE")
+		fmt.Println("              WASTED")
+		fmt.Println("===================================")
+		fmt.Println("You died in the streets of Neon City...")
+		p.HP = p.MaxHP / 2
+		fmt.Println("\nSystem reboot in progress...")
+		fmt.Printf(
+			"You have been revived with %d/%d HP.\n",
+			p.HP,
+			p.MaxHP,
+		)
+		fmt.Println("===================================")
 		return true
 	}
 	return false
 }
-func main(){
-	var name string
-	var choice int
-	var class string
-	fmt.Println("===========================")
-	fmt.Println("NEON CITY")
-	fmt.Println("===========================")
-	fmt.Println()
-	fmt.Println("Création de votre personnage")
-	fmt.Println()
-	fmt.Println("Quel est votre nom ?")
-	fmt.Scanln(&name)
-	fmt.Println()
-	fmt.Println("Choisissez votre classe :")
-	fmt.Println("1. Netrunner")
-	fmt.Println("2. Mercenaire")
-	fmt.Println("3. Cyborg")
-	fmt.Println()
-	fmt.Println("Votre choix : (Numéro de la classe)")
-	fmt.Scanln(&choice)
-	switch choice {
-	case 1:
-		class = "Netrunner"
-	case 2:
-		class = "Mercenaire"
-	case 3:
-		class = "Cyborg"
+
+// MENU PRINCIPAL
+
+func mainMenu(p *Character) {
+	for {
+		fmt.Println("\n===================================")
+		fmt.Println("            NEON CITY")
+		fmt.Println("===================================")
+		fmt.Println("1. Display character profile")
+		fmt.Println("2. Access inventory")
+		fmt.Println("3. Cybernetic Workshop")
+		fmt.Println("4. Quit")
+		var choice int
+		fmt.Print("\nEnter your choice: ")
+		fmt.Scanln(&choice)
+		switch choice {
+		case 1:
+			displayInfo(p)
+		case 2:
+			inventoryMenu(p)
+		case 3:
+			merchant(p)
+		case 4:
+			fmt.Println("\nExiting Neon City system...")
+			return
+		default:
+			fmt.Println("\nInvalid choice, please try again.")
+		}
 	}
-	character := initCharacter(name,class)
-	fmt.Println()
-	fmt.Println("===========================")
-	fmt.Println("Personnage créé")
-	fmt.Println("===========================")
-	fmt.Println("")
-	fmt.Println("bienvenue :",character.Name)
-	fmt.Println("Attaque :",character.Attack)
+}
+
+// MAIN
+func main() {
+	fmt.Println("===================================")
+	fmt.Println("            NEON CITY")
+	fmt.Println("===================================")
+	fmt.Println("\nWelcome to Neon City, year 2087.")
+	fmt.Println("Create your cybernetic character.\n")
+	// On utilise maintenant la fonction de création
+	character := characterCreation()
+	fmt.Println("\n===================================")
+	fmt.Println("       CHARACTER CREATED")
+	fmt.Println("===================================")
+	fmt.Println("Welcome,", character.Name)
+	fmt.Println("Class:", character.Class)
+	// Lancement du jeu
+	mainMenu(&character)
 }
