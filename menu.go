@@ -13,7 +13,9 @@ func mainMenu(p *Character) {
 		fmt.Println("2. Access inventory")
 		fmt.Println("3. Cybernetic Workshop")
 		fmt.Println("4. Training")
-		fmt.Println("5. Quit")
+		fmt.Println("5. Missions")
+		fmt.Println("6. Forgeron")
+		fmt.Println("7. Quit")
 		var choice int
 		fmt.Print("\nEnter your choice: ")
 		fmt.Scanln(&choice)
@@ -27,6 +29,10 @@ func mainMenu(p *Character) {
 		case 4:
 			trainingFight(p)
 		case 5:
+			missions(p)
+		case 6:
+			forgeron(p)
+		case 7:
 			fmt.Println("\nExiting Neon City system...")
 			return
 		default:
