@@ -41,7 +41,7 @@ func characterTurn(p *Character, monster *Monster) bool {
 		)
 		return true
 	case 2:
-		return combatInventory(p)
+		return combatInventory(p, monster)
 	default:
 		fmt.Println("Choix invalide.")
 		return false
@@ -62,7 +62,14 @@ func trainingFight(p *Character) {
 		if monster.HP <= 0 {
 			break
 		}
+		poisonTick(&monster)
+		if monster.HP <= 0 {
+			break
+		}
 		goblinPattern(p, &monster, turn)
+		if isDead(p) {
+			break
+		}
 		turn++
 	}
 }

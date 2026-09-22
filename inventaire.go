@@ -138,7 +138,7 @@ func inventoryMenu(p *Character) {
 	}
 }
 
-func combatInventory(p *Character) bool {
+func combatInventory(p *Character, monster *Monster) bool {
 	fmt.Println("\n===== INVENTAIRE DE COMBAT =====")
 	if len(p.Inventory) == 0 {
 		fmt.Println("Inventaire vide.")
@@ -163,7 +163,8 @@ func combatInventory(p *Character) bool {
 	case "Stimpack":
 		takePot(p)
 	case "Cyber Virus":
-		poisonPot(p)
+		removeInventoryItem(p, "Cyber Virus")
+		poisonMonster(monster)
 	case "Spellbook: Boule de Feu":
 		removeInventoryItem(p, "Spellbook: Boule de Feu")
 		spellBook(p)
@@ -172,4 +173,32 @@ func combatInventory(p *Character) bool {
 		return false
 	}
 	return true
+}
+
+func poisonMonster(monster *Monster) {
+	monster.Poisoned = true
+	monster.PoisonTurns = 3
+	fmt.Println("\n[!] Cyber Virus activé sur", monster.Name)
+	fmt.Println("L'ennemi sera empoisonné pendant 3 tours.")
+}
+
+func poisonTick(monster *Monster) {
+	if !monster.Poisoned {
+		return
+	}
+	monster.HP -= 10
+	monster.PoisonTurns--
+	if monster.HP < 0 {
+		monster.HP = 0
+	}
+	fmt.Printf(
+		"\n[POISON] %s perd 10 HP : %d/%d HP\n",
+		monster.Name,
+		monster.HP,
+		monster.MaxHP,
+	)
+	if monster.PoisonTurns <= 0 {
+		monster.Poisoned = false
+		fmt.Println("[POISON] Le Cyber Virus n'agit plus.")
+	}
 }
