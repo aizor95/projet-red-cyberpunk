@@ -21,6 +21,8 @@ type Character struct {
 	Equipment Equipment
 	Inventory []string
 	Skill []string
+	MaxInventory  int 
+	UpgradeCount  int
 }
 
 type Equipment struct {
@@ -76,6 +78,8 @@ func initCharacter(name string, class string) Character {
 		Equipment: Equipment{},
 		Inventory: []string{"Stimpack", "Cyber Virus"},
 		Skill:     []string{"Coup de poing"},
+		MaxInventory: 10,
+		UpgradeCount: 0,
 	}
 }
 

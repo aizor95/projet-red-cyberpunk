@@ -11,34 +11,38 @@ func accessInventory(p *Character) {
 	fmt.Println("\n===================================")
 	fmt.Println("          STORAGE UNIT")
 	fmt.Println("===================================")
+
 	if len(p.Inventory) == 0 {
 		fmt.Println("Inventory is empty.")
 		return
 	}
+
 	for i, item := range p.Inventory {
 		fmt.Printf("%d. %s\n", i+1, item)
 	}
-	fmt.Printf("\nStorage: %d/10 items\n", len(p.Inventory))
+
+	fmt.Printf("\nStorage: %d/%d items\n", len(p.Inventory), p.MaxInventory)
 }
 
 // Vérifie si l'inventaire est plein
+
 func isInventoryFull(p *Character) bool {
-	return len(p.Inventory) >= 10
+	return len(p.Inventory) >= p.MaxInventory
 }
 
 // Ajoute un objet
+
 func addInventory(p *Character, item string) {
 	if isInventoryFull(p) {
 		fmt.Println("\n[!] WARNING: Storage capacity reached!")
-		fmt.Println("Limit is 10 items.")
+		fmt.Printf("Limit is %d items.\n", p.MaxInventory)
 		fmt.Println("Could not acquire:", item)
 		return
 	}
 	p.Inventory = append(p.Inventory, item)
 	fmt.Printf("\n>> Added to storage: %s\n", item)
-	fmt.Printf("Storage: %d/10 items\n", len(p.Inventory))
+	fmt.Printf("Storage: %d/%d items\n", len(p.Inventory), p.MaxInventory)
 }
-
 // Retire le premier exemplaire d'un objet
 func removeInventoryItem(p *Character, itemName string) bool {
 	for i, item := range p.Inventory {
@@ -137,6 +141,29 @@ func inventoryMenu(p *Character) {
 		}
 	}
 }
+
+// Func upgradeInventorySlot 
+
+func upgradeInventorySlot(p *Character) {
+	if p.UpgradeCount >= 3 {
+		fmt.Println("Maximum inventory upgrades reached! (Max 3 times)")
+		return
+	}
+
+	cost := 30
+	if p.Argent < cost {
+		fmt.Println("Not enough credits")
+		return
+	}
+
+	p.Argent -= cost
+	p.MaxInventory += 10 
+	p.UpgradeCount++     
+
+	fmt.Println("Inventory upgraded!")
+	fmt.Printf("New capacity: %d\n", p.MaxInventory)
+}
+
 
 func combatInventory(p *Character, monster *Monster) bool {
 	fmt.Println("\n===== INVENTAIRE DE COMBAT =====")
