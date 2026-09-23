@@ -7,7 +7,7 @@ import "fmt"
 func merchant(p *Character) {
 	for {
 		fmt.Println("\n===================================")
-		fmt.Println("        CYBERNETIC WORKSHOP")
+		fmt.Println("       CYBERNETIC WORKSHOP")
 		fmt.Println("===================================")
 		fmt.Println("Your credits:", p.Argent)
 		fmt.Println()
@@ -18,14 +18,12 @@ func merchant(p *Character) {
 		fmt.Println("5. Peau de cyborg (7 crédits)")
 		fmt.Println("6. Cuir synthétique (3 crédits)")
 		fmt.Println("7. Fibre optique (1 crédit)")
-		fmt.Println("8. Batterie (5 credits)") // <--- Nuovo oggetto aggiunto
-		fmt.Println("9. Augmentation d'inventaire (30 credits)")
+		fmt.Println("8. Batterie (5 credits)")
+		fmt.Println("9. Augmentation d' inventaire(30 credits)")
 		fmt.Println("10. Back")
-
 		var choice int
 		fmt.Print("\nYour choice: ")
 		fmt.Scanln(&choice)
-
 		switch choice {
 		case 1:
 			if len(p.Inventory) >= p.MaxInventory {
@@ -97,7 +95,7 @@ func merchant(p *Character) {
 				addInventory(p, "Fibre optique")
 				fmt.Println("You bought Fibre optique")
 			}
-		case 8: // <--- Logica per l'acquisto della Batteria
+		case 8:
 			if len(p.Inventory) >= p.MaxInventory {
 				fmt.Println("Inventory is full")
 			} else if p.Argent < 5 {

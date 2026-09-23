@@ -2,120 +2,253 @@ package main
 
 import "fmt"
 
-var countKills int
-var missionKillActive bool
+// ===================================
+// LECTURE D'UN NOMBRE
+// ===================================
 
 func readIntInput() int {
+
 	var input string
+
 	fmt.Scanln(&input)
-	isNumber := true
-	for i := 0; i < len(input); i++ {
-		if input[i] < '0' || input[i] > '9' {
-			isNumber = false
-			break
-		}
-	}
-	if !isNumber || len(input) == 0 {
-		for i := 0; i < len(input); i++ {
-			fmt.Println("Erreur : Veuillez entrer un nombre valide !")
-		}
+
+	if len(input) == 0 {
 		return -1
 	}
-	val := 0
+
 	for i := 0; i < len(input); i++ {
-		val = val*10 + int(input[i]-'0')
+
+		if input[i] < '0' || input[i] > '9' {
+			return -1
+		}
 	}
-	return val
+
+	value := 0
+
+	for i := 0; i < len(input); i++ {
+
+		value = value*10 + int(input[i]-'0')
+	}
+
+	return value
 }
 
+// ===================================
+// MENU DES QUÊTES
+// ===================================
+
 func missions(p *Character) {
+
 	for {
+
 		fmt.Println("\n===================================")
-		fmt.Println("        AVAILABLE MISSIONS")
+		fmt.Println("          AVAILABLE QUESTS")
 		fmt.Println("===================================")
-		if missionKillActive {
-			fmt.Printf("1. Kill 3 monsters (+3 CREDITS) [EN COURS: %d/3]\n", countKills)
+
+		fmt.Println(
+			"Badge level:",
+			p.BadgeLevel,
+		)
+
+		// -------------------------------
+		// QUÊTE ACTIVE
+		// -------------------------------
+
+		if p.ActiveQuestID != "" {
+
+			activeQuest := getActiveQuest(p)
+
+			if activeQuest != nil {
+
+				fmt.Println("\n----- QUÊTE ACTIVE -----")
+
+				showQuestDetails(
+					*activeQuest,
+					p.QuestProgress,
+				)
+			}
+		}
+
+		// -------------------------------
+		// QUÊTES DISPONIBLES
+		// -------------------------------
+
+		available := availableQuests(p)
+
+		fmt.Println("\n===================================")
+		fmt.Println("         QUÊTES DISPONIBLES")
+		fmt.Println("===================================")
+
+		if len(available) == 0 {
+
+			fmt.Println("Aucune nouvelle quête disponible.")
+
 		} else {
-			fmt.Println("1. Kill 3 monsters (+3 CREDITS)")
+
+			for i, quest := range available {
+
+				fmt.Printf(
+					"%d. %s",
+					i+1,
+					quest.Name,
+				)
+
+				if quest.RewardBadge > 0 {
+					fmt.Printf(
+						" [Badge %d]",
+						quest.RewardBadge,
+					)
+				}
+
+				fmt.Println()
+			}
 		}
-		fmt.Println("2. Data Delivery (+3 CREDITS)")
-		fmt.Println("3. Terminal Hack (+3 CREDITS)")
-		fmt.Println("0. Back")
+
+		// -------------------------------
+		// OPTIONS
+		// -------------------------------
+
+		nextChoice := len(available) + 1
+
+		if p.ActiveQuestID != "" {
+
+			fmt.Printf(
+				"%d. Abandonner la quête active\n",
+				nextChoice,
+			)
+
+			nextChoice++
+		}
+
+		fmt.Printf(
+			"%d. Retour\n",
+			nextChoice,
+		)
+
 		fmt.Print("\nEnter your choice: ")
-		mission := readIntInput()
-		if mission == 0 {
-			break
+
+		choice := readIntInput()
+
+		if choice == -1 {
+
+			fmt.Println(
+				"\nErreur : Veuillez entrer un nombre valide !",
+			)
+
+			continue
 		}
-		switch mission {
-		case 1:
-			if !missionKillActive {
-				fmt.Println("\nMission : Kill 3 monsters")
-				fmt.Println("Reward : +3 CREDITS")
-				fmt.Println("1. Accept mission")
-				fmt.Println("2. Back")
-				fmt.Print("\nEnter your choice: ")
-				accept := readIntInput()
-				if accept == 1 {
-					missionKillActive = true
-					countKills = 0
-					fmt.Println("\nMission accepted!")
-					fmt.Println("You need to kill 3 monsters.")
-				} else {
-					fmt.Println("\nMission not accepted.")
-				}
-			} else {
-				fmt.Printf("\nMonsters killed: %d/3\n", countKills)
-				if countKills >= 3 {
-					p.Argent += 3
-					fmt.Println("\nMission completed!")
-					fmt.Println("+3 crédits.")
-					fmt.Println("TOTAL :", p.Argent, "CREDIT")
-					countKills = 0
-					missionKillActive = false
-				} else {
-					fmt.Printf("You need to kill %d more monster(s).\n", 3-countKills)
-				}
+
+		// -------------------------------
+		// RETOUR
+		// -------------------------------
+
+		if choice == nextChoice {
+			return
+		}
+
+		// -------------------------------
+		// ABANDON
+		// -------------------------------
+
+		if p.ActiveQuestID != "" &&
+			choice == len(available)+1 {
+
+			fmt.Println(
+				"\nAttention : abandonner la quête supprimera votre progression.",
+			)
+
+			fmt.Println("1. Confirmer")
+			fmt.Println("2. Annuler")
+
+			fmt.Print("Votre choix : ")
+
+			confirm := readIntInput()
+
+			if confirm == 1 {
+				abandonQuest(p)
 			}
-		case 2:
-			if missionKillActive {
-				fmt.Println("\n/!\\ ATTENTION /!\\")
-				fmt.Println("Vous avez deja une quete en cours !")
-				fmt.Println("Si vous changez de quete, vous allez perdre votre progression.")
-				fmt.Print("Voulez-vous continuer ? (1 = Oui / 2 = Non) : ")
-				choix := readIntInput()
-				if choix != 1 {
-					fmt.Println("\nChangement de quete annule.")
+
+			continue
+		}
+
+		// -------------------------------
+		// SÉLECTION D'UNE QUÊTE
+		// -------------------------------
+
+		if choice >= 1 &&
+			choice <= len(available) {
+
+			selectedQuest := available[choice-1]
+
+			fmt.Println()
+
+			showQuestDetails(
+				selectedQuest,
+				0,
+			)
+
+			fmt.Println("\n1. Accepter la quête")
+			fmt.Println("2. Retour")
+
+			fmt.Print("Votre choix : ")
+
+			accept := readIntInput()
+
+			if accept != 1 {
+				continue
+			}
+
+			// -------------------------------
+			// CHANGEMENT DE QUÊTE
+			// -------------------------------
+
+			if p.ActiveQuestID != "" {
+
+				if selectedQuest.StartItem != "" &&
+					isInventoryFull(p) {
+
+					fmt.Println(
+						"\nInventaire plein. Impossible d'accepter cette quête.",
+					)
+
 					continue
 				}
-				missionKillActive = false
-				countKills = 0
-			}
-			p.Argent += 3
-			fmt.Println("\nLivraison effectuée avec succès !")
-			fmt.Println("+3 crédits.")
-			fmt.Println("TOTAL :", p.Argent, "CREDIT")
-		case 3:
-			if missionKillActive {
-				fmt.Println("\n/!\\ ATTENTION /!\\")
-				fmt.Println("Vous avez deja une quete en cours !")
-				fmt.Println("Si vous changez de quete, vous allez perdre votre progression.")
-				fmt.Print("Voulez-vous continuer ? (1 = Oui / 2 = Non) : ")
-				choix := readIntInput()
-				if choix != 1 {
-					fmt.Println("\nChangement de quete annule.")
+
+				fmt.Println(
+					"\n===================================",
+				)
+
+				fmt.Println(
+					"Vous avez déjà une quête active.",
+				)
+
+				fmt.Println(
+					"Changer de quête supprimera sa progression.",
+				)
+
+				fmt.Println(
+					"1. Changer de quête",
+				)
+
+				fmt.Println(
+					"2. Garder la quête actuelle",
+				)
+
+				fmt.Print("Votre choix : ")
+
+				change := readIntInput()
+
+				if change != 1 {
 					continue
 				}
-				missionKillActive = false
-				countKills = 0
+
+				abandonQuest(p)
 			}
-			p.Argent += 3
-			fmt.Println("\nTerminal piraté avec succès !")
-			fmt.Println("+3 crédits.")
-			fmt.Println("TOTAL :", p.Argent, "CREDIT")
-		default:
-			if mission != -1 {
-				fmt.Println("\nChoix invalide.")
-			}
+
+			acceptQuest(
+				p,
+				selectedQuest,
+			)
 		}
 	}
 }

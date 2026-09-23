@@ -114,20 +114,18 @@ func inventoryMenu(p *Character) {
 		fmt.Println("\nWhat do you want to do?")
 		fmt.Println("1. Use Stimpack")
 		fmt.Println("2. Use Cyber Virus")
-		fmt.Println("3. Use Batterie") // <--- Aggiunto
+		fmt.Println("3. Use Batterie")
 		fmt.Println("4. Use Programme : Surcharge plasma")
-		fmt.Println("5. Back") // <--- Spostato a 5
-
+		fmt.Println("5. Back")
 		var choice int
 		fmt.Print("Choice: ")
 		fmt.Scanln(&choice)
-
 		switch choice {
 		case 1:
 			takePot(p)
 		case 2:
 			poisonPot(p)
-		case 3: // <--- Gestione batteria
+		case 3:
 			useBattery(p)
 		case 4:
 			if removeInventoryItem(p, "Programme : Surcharge plasma") {
@@ -223,8 +221,8 @@ func upgradeInventorySlot(p *Character) {
 		return
 	}
 	p.Argent -= cost
-	p.MaxInventory += 10
-	p.UpgradeCount++
+	p.MaxInventory += 10 
+	p.UpgradeCount++     
 	fmt.Println("Inventory upgraded!")
 	fmt.Printf("New capacity: %d\n", p.MaxInventory)
 }
@@ -234,7 +232,10 @@ func useBattery(p *Character) {
 		fmt.Println("\nError: No Batterie available!")
 		return
 	}
-	p.Energy += 30 // Aumenta l'energia di 30 punti (puoi modificare il valore)
+	p.Energy += 30
+	if p.Energy > p.MaxEnergy {
+		p.Energy = p.MaxEnergy
+	}
 	fmt.Println("\n>>> Battery used! (+30 Energy)")
-	fmt.Printf("Current energy: %d\n", p.Energy)
+	fmt.Printf("Current energy: %d/%d\n", p.Energy, p.MaxEnergy)
 }
