@@ -7,13 +7,42 @@ func EquipeArmor(p *Character) {
 	fmt.Println("         EQUIPMENT MANAGEMENT      ")
 	fmt.Println("===================================")
 
-	if len(p.Inventory) == 0 {
-		fmt.Println("Your inventory is empty.")
+	// Mostra l'equipaggiamento attualmente indossato
+	fmt.Println("Current Equipment:")
+	if p.Equipment.head.Name != "" {
+		fmt.Printf("- Head: %s (+%d max HP)\n", p.Equipment.head.Name, p.Equipment.head.MaxHPbonus)
+	} else {
+		fmt.Println("- Head: Empty")
+	}
+
+	if p.Equipment.torse.Name != "" {
+		fmt.Printf("- Torso: %s (+%d max HP)\n", p.Equipment.torse.Name, p.Equipment.torse.MaxHPbonus)
+	} else {
+		fmt.Println("- Torso: Empty")
+	}
+
+	if p.Equipment.feet.Name != "" {
+		fmt.Printf("- Feet: %s (+%d max HP)\n", p.Equipment.feet.Name, p.Equipment.feet.MaxHPbonus)
+	} else {
+		fmt.Println("- Feet: Empty")
+	}
+	fmt.Println("-----------------------------------")
+
+	// Filtriamo solo gli oggetti che sono effettivamente delle armature
+	var armorItems []string
+	for _, item := range p.Inventory {
+		if item == "Visière tactique" || item == "Veste en fibre de carbone" || item == "Bottes cybernétiques" {
+			armorItems = append(armorItems, item)
+		}
+	}
+
+	if len(armorItems) == 0 {
+		fmt.Println("You don't have any armor in your storage.")
 		return
 	}
 
-	fmt.Println("Choose an item to equip:")
-	for i, item := range p.Inventory {
+	fmt.Println("Choose an armor to equip:")
+	for i, item := range armorItems {
 		fmt.Printf("%d. %s\n", i+1, item)
 	}
 	fmt.Println("0. Back")
@@ -25,32 +54,29 @@ func EquipeArmor(p *Character) {
 	if choice == 0 {
 		return
 	}
-	if choice < 1 || choice > len(p.Inventory) {
+	if choice < 1 || choice > len(armorItems) {
 		fmt.Println("Invalid choice.")
 		return
 	}
 
-	itemName := p.Inventory[choice-1]
+	itemName := armorItems[choice-1]
 
 	var slot string
 	var hpBonus int
 
 	switch itemName {
-	case "Visière Tactique":
+	case "Visière tactique":
 		slot = "head"
 		hpBonus = 10
-	case "Veste en Fibre de Carbone":
+	case "Veste en fibre de carbone":
 		slot = "torse"
 		hpBonus = 25
-	case "Bottes Cybernétiques":
+	case "Bottes cybernétiques":
 		slot = "feet"
 		hpBonus = 15
-	default:
-		fmt.Println("This item cannot be equipped.")
-		return
 	}
 
-	p.Inventory = append(p.Inventory[:choice-1], p.Inventory[choice:]...)
+	removeInventoryItem(p, itemName)
 
 	switch slot {
 	case "head":
