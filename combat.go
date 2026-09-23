@@ -122,6 +122,22 @@ func combatSkills(p *Character, monster *Monster) bool {
 
 func trainingFight(p *Character) {
 	monster := initRobot()
+	fight(p, monster)
+}
+
+func monsterDefeated(p *Character, monster *Monster) {
+	if missionKillActive {
+		countKills++
+		fmt.Printf(
+			"\nMission Kill 3 Monsters : %d/3\n",
+			countKills,
+		)
+	}
+	giveDrops(p, monster)
+	gainExperience(p, monster.XPReward)
+}
+
+func fight(p *Character, monster Monster) {
 	turn := 1
 	for p.HP > 0 && monster.HP > 0 {
 		fmt.Println("\n===================================")
@@ -134,20 +150,12 @@ func trainingFight(p *Character) {
 				continue
 			}
 			if monster.HP <= 0 {
-				if missionKillActive {
-					countKills++
-				}
-				giveDrops(p, &monster)
-				gainExperience(p, monster.XPReward)
+				monsterDefeated(p, &monster)
 				break
 			}
 			poisonTick(&monster)
 			if monster.HP <= 0 {
-				if missionKillActive {
-					countKills++
-				}
-				giveDrops(p, &monster)
-				gainExperience(p, monster.XPReward)
+				monsterDefeated(p, &monster)
 				break
 			}
 			MonstrePattern(p, &monster, turn)
@@ -163,8 +171,7 @@ func trainingFight(p *Character) {
 			}
 			poisonTick(&monster)
 			if monster.HP <= 0 {
-				giveDrops(p, &monster)
-				gainExperience(p, monster.XPReward)
+				monsterDefeated(p, &monster)
 				break
 			}
 			playerPlayed := characterTurn(p, &monster)
@@ -172,8 +179,7 @@ func trainingFight(p *Character) {
 				continue
 			}
 			if monster.HP <= 0 {
-				giveDrops(p, &monster)
-				gainExperience(p, monster.XPReward)
+				monsterDefeated(p, &monster)
 				break
 			}
 		}

@@ -12,7 +12,7 @@ func mainMenu(p *Character) {
 		fmt.Println("1. Display character profile")
 		fmt.Println("2. Access inventory")
 		fmt.Println("3. Cybernetic Workshop")
-		fmt.Println("4. Training")
+		fmt.Println("4. Explorer Neon City")
 		fmt.Println("5. Missions")
 		fmt.Println("6. Forgeron")
 		fmt.Println("7. Equipement")
@@ -28,7 +28,7 @@ func mainMenu(p *Character) {
 		case 3:
 			merchant(p)
 		case 4:
-			trainingFight(p)
+			explore(p)
 		case 5:
 			missions(p)
 		case 6:
