@@ -1,3 +1,7 @@
+package main
+
+import "fmt"
+
 func forgeron(p *Character) {
 	fmt.Println("\n===================================")
 	fmt.Println("             FORGERON              ")

@@ -11,27 +11,22 @@ func accessInventory(p *Character) {
 	fmt.Println("\n===================================")
 	fmt.Println("          STORAGE UNIT")
 	fmt.Println("===================================")
-
 	if len(p.Inventory) == 0 {
 		fmt.Println("Inventory is empty.")
 		return
 	}
-
 	for i, item := range p.Inventory {
 		fmt.Printf("%d. %s\n", i+1, item)
 	}
-
 	fmt.Printf("\nStorage: %d/%d items\n", len(p.Inventory), p.MaxInventory)
 }
 
 // Vérifie si l'inventaire est plein
-
 func isInventoryFull(p *Character) bool {
 	return len(p.Inventory) >= p.MaxInventory
 }
 
 // Ajoute un objet
-
 func addInventory(p *Character, item string) {
 	if isInventoryFull(p) {
 		fmt.Println("\n[!] WARNING: Storage capacity reached!")
@@ -43,6 +38,7 @@ func addInventory(p *Character, item string) {
 	fmt.Printf("\n>> Added to storage: %s\n", item)
 	fmt.Printf("Storage: %d/%d items\n", len(p.Inventory), p.MaxInventory)
 }
+
 // Retire le premier exemplaire d'un objet
 func removeInventoryItem(p *Character, itemName string) bool {
 	for i, item := range p.Inventory {
@@ -101,13 +97,13 @@ func poisonPot(p *Character) {
 // Livre de sorts
 func spellBook(p *Character) {
 	for _, skill := range p.Skill {
-		if skill == "Boule de Feu" {
-			fmt.Println("\nYou have already learned Boule de Feu!")
+		if skill == "Surcharge plasma" {
+			fmt.Println("\nYou have already learned Surcharge plasma!")
 			return
 		}
 	}
-	p.Skill = append(p.Skill, "Boule de Feu")
-	fmt.Println("\n>>> New spell learned: Boule de Feu!")
+	p.Skill = append(p.Skill, "Surcharge plasma")
+	fmt.Println("\n>>> New programme learned: Surcharge plasma!")
 }
 
 // UTILISATION DE L'INVENTAIRE
@@ -118,7 +114,7 @@ func inventoryMenu(p *Character) {
 		fmt.Println("\nWhat do you want to do?")
 		fmt.Println("1. Use Stimpack")
 		fmt.Println("2. Use Cyber Virus")
-		fmt.Println("3. Use Spellbook: Boule de Feu")
+		fmt.Println("3. Use Programme : Surcharge plasma")
 		fmt.Println("4. Back")
 		var choice int
 		fmt.Print("Choice: ")
@@ -129,10 +125,10 @@ func inventoryMenu(p *Character) {
 		case 2:
 			poisonPot(p)
 		case 3:
-			if removeInventoryItem(p, "Spellbook: Boule de Feu") {
+			if removeInventoryItem(p, "Programme : Surcharge plasma") {
 				spellBook(p)
 			} else {
-				fmt.Println("\nYou do not have this spellbook.")
+				fmt.Println("\nYou do not have this programme.")
 			}
 		case 4:
 			return
@@ -141,29 +137,6 @@ func inventoryMenu(p *Character) {
 		}
 	}
 }
-
-// Func upgradeInventorySlot 
-
-func upgradeInventorySlot(p *Character) {
-	if p.UpgradeCount >= 3 {
-		fmt.Println("Maximum inventory upgrades reached! (Max 3 times)")
-		return
-	}
-
-	cost := 30
-	if p.Argent < cost {
-		fmt.Println("Not enough credits")
-		return
-	}
-
-	p.Argent -= cost
-	p.MaxInventory += 10 
-	p.UpgradeCount++     
-
-	fmt.Println("Inventory upgraded!")
-	fmt.Printf("New capacity: %d\n", p.MaxInventory)
-}
-
 
 func combatInventory(p *Character, monster *Monster) bool {
 	fmt.Println("\n===== INVENTAIRE DE COMBAT =====")
@@ -192,8 +165,8 @@ func combatInventory(p *Character, monster *Monster) bool {
 	case "Cyber Virus":
 		removeInventoryItem(p, "Cyber Virus")
 		poisonMonster(monster)
-	case "Spellbook: Boule de Feu":
-		removeInventoryItem(p, "Spellbook: Boule de Feu")
+	case "Programme : Surcharge plasma":
+		removeInventoryItem(p, "Programme : Surcharge plasma")
 		spellBook(p)
 	default:
 		fmt.Println("Cet objet ne peut pas être utilisé.")
@@ -228,4 +201,23 @@ func poisonTick(monster *Monster) {
 		monster.Poisoned = false
 		fmt.Println("[POISON] Le Cyber Virus n'agit plus.")
 	}
+}
+
+// amélioration de l'inventaire
+
+func upgradeInventorySlot(p *Character) {
+	if p.UpgradeCount >= 3 {
+		fmt.Println("Maximum inventory upgrades reached! (Max 3 times)")
+		return
+	}
+	cost := 30
+	if p.Argent < cost {
+		fmt.Println("Not enough credits")
+		return
+	}
+	p.Argent -= cost
+	p.MaxInventory += 10 
+	p.UpgradeCount++     
+	fmt.Println("Inventory upgraded!")
+	fmt.Printf("New capacity: %d\n", p.MaxInventory)
 }

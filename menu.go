@@ -26,7 +26,7 @@ func mainMenu(p *Character) {
 		case 2:
 			inventoryMenu(p)
 		case 3:
-			marchand(p)
+			merchant(p)
 		case 4:
 			trainingFight(p)
 		case 5:
